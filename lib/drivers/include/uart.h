@@ -179,6 +179,75 @@ typedef enum _uart_receive_trigger
     UART_RECEIVE_FIFO_14,
 } uart_receive_trigger_t;
 
+typedef struct _uart_data_t
+{
+    dmac_channel_number_t tx_channel;
+    dmac_channel_number_t rx_channel;
+    uint32_t *tx_buf;
+    size_t tx_len;
+    uint32_t *rx_buf;
+    size_t rx_len;
+    uart_interrupt_mode_t transfer_mode;
+} uart_data_t;
+
+typedef struct _uart_tcr
+{
+    uint32_t rs485_en : 1;
+    uint32_t re_pol : 1;
+    uint32_t de_pol : 1;
+    uint32_t xfer_mode : 2;
+    uint32_t reserve : 27;
+} uart_tcr_t;
+
+typedef enum _uart_work_mode
+{
+    UART_NORMAL,
+    UART_IRDA,
+    UART_RS485_FULL_DUPLEX,
+    UART_RS485_HALF_DUPLEX,
+} uart_work_mode_t;
+
+typedef enum _uart_rs485_rede
+{
+    UART_RS485_DE,
+    UART_RS485_RE,
+    UART_RS485_REDE,
+} uart_rs485_rede_t;
+
+typedef enum _uart_polarity
+{
+    UART_LOW,
+    UART_HIGH,
+} uart_polarity_t;
+
+typedef enum _uart_det_mode
+{
+    UART_DE_ASSERTION,
+    UART_DE_DE_ASSERTION,
+    UART_DE_ALL,
+} uart_det_mode_t;
+
+typedef struct _uart_det
+{
+    uint32_t de_assertion_time : 8;
+    uint32_t reserve0 : 8;
+    uint32_t de_de_assertion_time : 8;
+    uint32_t reserve1 : 8;
+} uart_det_t;
+
+typedef enum _uart_tat_mode
+{
+    UART_DE_TO_RE,
+    UART_RE_TO_DE,
+    UART_TAT_ALL,
+} uart_tat_mode_t;
+
+typedef struct _uart_tat
+{
+    uint32_t de_to_re : 16;
+    uint32_t re_to_de : 16;
+} uart_tat_t;
+
 /**
  * @brief       Send data from uart
  *
@@ -326,6 +395,79 @@ void uart_send_data_dma_irq(uart_device_number_t uart_channel, dmac_channel_numb
 void uart_receive_data_dma_irq(uart_device_number_t uart_channel, dmac_channel_number_t dmac_channel,
                                uint8_t *buffer, size_t buf_len, plic_irq_callback_t uart_callback,
                                void *ctx, uint32_t priority);
+
+/**
+ * @brief       Uart handle transfer data operations
+ *
+ * @param[in]   uart_channel        Uart index
+ * @param[in]   data                Uart data information
+ * @param[in]   buffer              Uart DMA callback
+ *
+ */
+void uart_handle_data_dma(uart_device_number_t uart_channel ,uart_data_t data, plic_interrupt_t *cb);
+
+/**
+ * @brief       Set uart work mode
+ *
+ * @param[in]   uart_channel        Uart index
+ * @param[in]   work_mode           Work mode
+                                    0:uart
+                                    1: infrared
+                                    2:full duplex rs485, control re and de manually
+                                    3:half duplex rs485, control re and de automatically
+ *
+ */
+void uart_set_work_mode(uart_device_number_t uart_channel, uart_work_mode_t work_mode);
+
+/**
+ * @brief       Set re or de driver enable polarity
+ *
+ * @param[in]   uart_channel        Uart index
+ * @param[in]   rede                re or de
+                                    0:de
+                                    1:re
+                                    2:de and re
+ * @param[in]   polarity            Polarity
+                                    0:signal is active low
+                                    1:signal is active high
+ *
+ */
+void uart_set_rede_polarity(uart_device_number_t uart_channel, uart_rs485_rede_t rede, uart_polarity_t polarity);
+
+/**
+ * @brief       Set rs485 de and re signal driver output enable
+ *
+ * @param[in]   uart_channel        Uart index
+ * @param[in]   rede                0:de
+                                    1:re
+                                    2:de and re
+ * @param[in]   enable              0:de-assert signal
+                                    1:assert signal
+ *
+ */
+void uart_set_rede_enable(uart_device_number_t uart_channel, uart_rs485_rede_t rede, bool enable);
+
+/**
+ * @brief       Set turn around time between switch of 're' and 'de' signals
+ *
+ * @param[in]   uart_channel        Uart index
+ * @param[in]   tat_mode            0:de to re
+                                    1:re to de
+ * @param[in]   time                turn around time nanosecond
+ *
+ */
+void uart_set_tat(uart_device_number_t uart_channel, uart_tat_mode_t tat_mode, size_t time);
+
+/**
+ * @brief       Set driver output enable time used to control de assertion and de-assertion timeing of 'de' signal
+ *
+ * @param[in]   uart_channel        Uart index
+ * @param[in]   det_mode            0:de assertion
+                                    1:de de-assertion
+ * @param[in]   time                driver output enable time nanosecond
+ *
+ */
+void uart_set_det(uart_device_number_t uart_channel, uart_det_mode_t det_mode, size_t time);
 
 #ifdef __cplusplus
 }
