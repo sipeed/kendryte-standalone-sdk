@@ -207,6 +207,7 @@ static int kpu_config_input(void *ctx)
     {
         for (uint32_t i = 0; i < task->remain_layers_length; i++)
         {
+            usleep(1);
             kpu->layer_argument_fifo = task->remain_layers[i].interrupt_enabe.reg;
             kpu->layer_argument_fifo = task->remain_layers[i].image_addr.reg;
             kpu->layer_argument_fifo = task->remain_layers[i].image_channel_num.reg;

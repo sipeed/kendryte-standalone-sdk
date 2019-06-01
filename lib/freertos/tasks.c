@@ -3586,7 +3586,8 @@ static void prvCheckTasksWaitingTermination( void )
 
 	void vTaskGetInfo( TaskHandle_t xTask, TaskStatus_t *pxTaskStatus, BaseType_t xGetFreeStackSpace, eTaskState eState )
 	{
-	TCB_t *pxTCB;
+		TCB_t *pxTCB;
+		UBaseType_t uxPsrId = uxPortGetProcessorId();
 
 		/* xTask is NULL then get the state of the calling task. */
 		pxTCB = prvGetTCBFromHandle( xTask );
@@ -4257,7 +4258,7 @@ UBaseType_t uxPsrId = uxPortGetProcessorId();
 	TaskStatus_t *pxTaskStatusArray;
 	volatile UBaseType_t uxArraySize, x;
 	char cStatus;
-
+	UBaseType_t uxPsrId = uxPortGetProcessorId();
 		/*
 		 * PLEASE NOTE:
 		 *
@@ -4293,8 +4294,8 @@ UBaseType_t uxPsrId = uxPortGetProcessorId();
 		/* Allocate an array index for each task.  NOTE!  if
 		configSUPPORT_DYNAMIC_ALLOCATION is set to 0 then pvPortMalloc() will
 		equate to NULL. */
-		pxTaskStatusArray = pvPortMalloc( uxCurrentNumberOfTasks * sizeof( TaskStatus_t ) );
-
+		//pxTaskStatusArray = pvPortMalloc( uxCurrentNumberOfTasks * sizeof( TaskStatus_t ) );
+		pxTaskStatusArray = pvPortMalloc( uxCurrentNumberOfTasks[uxPsrId] * sizeof( TaskStatus_t ) );
 		if( pxTaskStatusArray != NULL )
 		{
 			/* Generate the (binary) data. */

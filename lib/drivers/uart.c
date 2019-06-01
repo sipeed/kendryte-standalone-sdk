@@ -75,7 +75,7 @@ static uart_instance_dma_t g_uart_send_instance_dma[3];
 static uart_instance_dma_t g_uart_recv_instance_dma[3];
 
 volatile int g_write_count = 0;
-
+volatile uint32_t tmp_;
 static int uart_irq_callback(void *param)
 {
     uart_instance_t *uart_instance = (uart_instance_t *)param;
@@ -91,6 +91,12 @@ static int uart_irq_callback(void *param)
     {
         if(uart_instance->uart_receive_instance.callback != NULL)
             uart_instance->uart_receive_instance.callback(uart_instance->uart_receive_instance.ctx);
+    }
+    else
+    {
+        tmp_ = uart[v_channel]->LSR;
+        tmp_ = uart[v_channel]->USR;
+        tmp_ = uart[v_channel]->MSR;
     }
     return 0;
 }

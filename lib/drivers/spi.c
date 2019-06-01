@@ -659,7 +659,6 @@ void spi_receive_data_normal_dma(dmac_channel_number_t dma_send_channel_num,
                                   size_t cmd_len, void *rx_buff, size_t rx_len)
 {
     configASSERT(spi_num < SPI_DEVICE_MAX && spi_num != 2);
-
     if(cmd_len == 0)
        spi_set_tmod(spi_num, SPI_TMOD_RECV);
     else
@@ -717,7 +716,7 @@ void spi_receive_data_standard_dma(dmac_channel_number_t dma_send_channel_num,
     uint32_t data_bit_length = (spi_handle->ctrlr0 >> dfs_offset) & 0x1F;
     spi_transfer_width_t frame_width = spi_get_frame_size(data_bit_length);
 
-    size_t i;
+    size_t i, j;
 
     uint32_t *write_cmd;
     uint32_t *read_buf;
@@ -756,12 +755,22 @@ void spi_receive_data_standard_dma(dmac_channel_number_t dma_send_channel_num,
     switch(frame_width)
     {
         case SPI_TRANS_INT:
+            // for(i = 0; i < v_recv_len; i++)
+            //     ((uint32_t *)rx_buff)[i] = read_buf[i];
             for(i = 0; i < v_recv_len; i++)
-                ((uint32_t *)rx_buff)[i] = read_buf[i];
+            {
+                for(j=0; j<SPI_TRANS_INT; ++j)
+                    rx_buff[i*SPI_TRANS_INT+j] = ((uint8_t*)read_buf)[i*SPI_TRANS_INT+j];
+            }
             break;
         case SPI_TRANS_SHORT:
+            // for(i = 0; i < v_recv_len; i++)
+            //     ((uint16_t *)rx_buff)[i] = read_buf[i];
             for(i = 0; i < v_recv_len; i++)
-                ((uint16_t *)rx_buff)[i] = read_buf[i];
+            {
+                for(j=0; j<SPI_TRANS_SHORT; ++j)
+                    rx_buff[i*SPI_TRANS_SHORT+j] = ((uint8_t*)read_buf)[i*SPI_TRANS_SHORT+j];
+            }
             break;
         default:
             for(i = 0; i < v_recv_len; i++)
@@ -861,7 +870,6 @@ void spi_receive_data_multiple_dma(dmac_channel_number_t dma_send_channel_num,
                                   size_t cmd_len, uint8_t *rx_buff, size_t rx_len)
 {
     configASSERT(spi_num < SPI_DEVICE_MAX && spi_num != 2);
-
     volatile spi_t *spi_handle = spi[spi_num];
 
     uint8_t dfs_offset;
@@ -893,14 +901,14 @@ void spi_receive_data_multiple_dma(dmac_channel_number_t dma_send_channel_num,
            v_recv_len = rx_len / 4;
            break;
        case SPI_TRANS_SHORT:
-           write_cmd = malloc(cmd_len + rx_len /2 * sizeof(uint32_t));
+           write_cmd = malloc(cmd_len + rx_len /2 * sizeof(uint32_t) + 128);
            for(i = 0; i < cmd_len; i++)
                write_cmd[i] = cmd_buff[i];
            read_buf = &write_cmd[i];
            v_recv_len = rx_len / 2;
            break;
        default:
-           write_cmd = malloc(cmd_len + rx_len * sizeof(uint32_t));
+           write_cmd = malloc(cmd_len + rx_len * sizeof(uint32_t) + 128);
            for(i = 0; i < cmd_len; i++)
                write_cmd[i] = cmd_buff[i];
            read_buf = &write_cmd[i];
