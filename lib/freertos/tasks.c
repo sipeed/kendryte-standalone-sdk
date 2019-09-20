@@ -3864,6 +3864,7 @@ UBaseType_t uxPsrId = uxPortGetProcessorId();
 	BaseType_t xTaskGetSchedulerState( void )
 	{
 	BaseType_t xReturn;
+	UBaseType_t uxPsrId = uxPortGetProcessorId();
 
 		if( xSchedulerRunning == pdFALSE )
 		{
