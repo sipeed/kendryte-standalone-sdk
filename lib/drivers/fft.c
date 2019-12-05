@@ -16,7 +16,7 @@
 #include "dmac.h"
 #include "utils.h"
 #include "sysctl.h"
-#include "fft.h"
+#include "hal_fft.h"
 
 static volatile fft_t *const fft = (volatile fft_t *)FFT_BASE_ADDR;
 
