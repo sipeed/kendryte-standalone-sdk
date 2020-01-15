@@ -1828,7 +1828,8 @@ void sysctl_disable_irq(void)
 uint64_t sysctl_get_time_us(void)
 {
     uint64_t v_cycle = read_cycle();
-    return v_cycle * 1000000 / sysctl_clock_get_freq(SYSCTL_CLOCK_CPU);
+    // return v_cycle * 1000000 / sysctl_clock_get_freq(SYSCTL_CLOCK_CPU);
+    return v_cycle / (sysctl_clock_get_freq(SYSCTL_CLOCK_CPU) / 1000000);
 }
 
 sysctl_reset_enum_status_t sysctl_get_reset_status(void)
