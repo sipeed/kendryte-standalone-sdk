@@ -30,7 +30,7 @@ add_compile_flags(BOTH
         )
 
 add_compile_flags(C -std=gnu11 -Wno-pointer-to-int-cast)
-add_compile_flags(CXX -std=gnu++17)
+add_compile_flags(CXX -std=gnu++17 -DNNCASE_TARGET=k210)
 
 if (BUILDING_SDK)
     add_compile_flags(BOTH

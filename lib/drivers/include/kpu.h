@@ -20,6 +20,7 @@
 #include "dmac.h"
 
 #define kpu_matmul_begin kpu_conv2d_output
+#define IOMEM 0x40000000
 
 typedef int (*plic_irq_callback_t)(void *ctx);
 
@@ -662,20 +663,67 @@ typedef struct
 
 typedef void(*kpu_done_callback_t)(void* userdata);
 
+
 typedef struct
 {
-    const uint8_t *model_buffer;
-    uint8_t *main_buffer;
-    uint32_t output_count;
-    const kpu_model_output_t *outputs;
-    const kpu_model_layer_header_t *layer_headers;
-    const uint8_t *body_start;
-    uint32_t layers_length;
-    volatile uint32_t current_layer;
-    const uint8_t * volatile current_body;
-    dmac_channel_number_t dma_ch;
-    kpu_done_callback_t done_callback;
-    void *userdata;
+	uint8_t start_idx;
+	uint8_t end_idx;
+	uint8_t loading;
+	uint8_t oft;
+}kpu_layer_buf_t;
+
+typedef enum {
+    KL_BUF_INIT = 0,
+    KL_BUF_LOADING,
+	KL_BUF_LOADED,
+	KL_BUF_END
+}kpu_layerbuf_state_t;
+
+typedef enum {
+    KL_SINGLE_BUF = 0,
+    KL_DUAL_BUF = 1
+}kpu_layerbuf_flag_t;
+
+typedef struct
+{
+    int is_nncase;
+
+    union
+    {
+        struct
+        {
+            const uint8_t *model_buffer;
+            uint8_t *main_buffer;
+			/*Add for Flash loader*/
+			uint32_t spi_speed;
+			uint8_t *model_buffer_ram_original;
+			uint8_t *model_buffer_ram;
+			uint32_t dual_buf_flag;
+			uint32_t flash_addr;
+			uint32_t buf_idx;
+			uint32_t buf_size;
+			uint32_t layer_batch_size;
+			uint8_t* layer_buf[2];	//预留两个buf
+			kpu_layer_buf_t buf_layer_info[2];	//[start, end),loading,oft
+			uint32_t virtual_model_buffer[2];
+			/*end of Add for Flash loader*/
+            uint32_t output_count;
+            const kpu_model_output_t *outputs;
+            const kpu_model_layer_header_t *layer_headers;
+            const uint8_t *body_start;
+            uint32_t layers_length;
+            volatile uint32_t current_layer;
+            const uint8_t *volatile current_body;
+            dmac_channel_number_t dma_ch;
+            kpu_done_callback_t done_callback;
+            void *userdata;
+        };
+
+        struct
+        {
+            void* nncase_ctx;
+        };
+    };
 } kpu_model_context_t;
 
 typedef struct
