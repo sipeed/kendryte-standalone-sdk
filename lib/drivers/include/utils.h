@@ -285,7 +285,7 @@ extern "C" {
 #define configASSERT(x)                                   \
     if((x) == 0)                                          \
     {                                                     \
-        printf("(%s:%d) %s\r\n", __FILE__, __LINE__, #x); \
+        printf("(L%d) %s\r\n", __LINE__, #x); \
         for(;;)                                           \
             ;                                             \
     }
