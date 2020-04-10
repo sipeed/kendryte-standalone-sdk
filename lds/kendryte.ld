@@ -77,14 +77,6 @@ PHDRS
  */
 SECTIONS
 {
-   /* Data store in IO MEMORY */
-  /* .iodata (0x40600000- (4125 * 1024)): */
-  .iodata (0x40600000- (3950 * 1024)):
-  {
-    /* Writable data segment (.iodata segment) */
-    *(.iodata .iodata.*)
-  } >ram_nocache AT>ram_nocache :ram_init
-
   /* Program code segment, also known as a text segment */
   .text :
   {
@@ -111,6 +103,16 @@ SECTIONS
 
   . = ALIGN(8);
 
+  /* Exception handling  */
+  .eh_frame :
+  {
+    KEEP (*(.eh_frame)) *(.eh_frame.*)
+    . = ALIGN(8);
+  } >ram AT>ram :ram_ro
+  .gnu_extab : { *(.gnu_extab) } >ram AT>ram :ram_ro
+  .gcc_except_table : { *(.gcc_except_table .gcc_except_table.*) } >ram AT>ram :ram_ro
+  .exception_ranges : { *(.exception_ranges .exception_ranges*) } >ram AT>ram :ram_ro
+
   /* Init array and fini array */
   .preinit_array :
   {
@@ -123,7 +125,7 @@ SECTIONS
   {
     PROVIDE_HIDDEN (__init_array_start = .);
     KEEP (*(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*)))
-    KEEP (*(.init_array EXCLUDE_FILE (*crtbegin.o *crtbegin?.o *crtend.o *crtend?.o ) .ctors))
+    *(.init_array EXCLUDE_FILE (*crtbegin.o *crtbegin?.o *crtend.o *crtend?.o ) .ctors)
     PROVIDE_HIDDEN (__init_array_end = .);
   } >ram AT>ram :ram_ro
 
@@ -266,7 +268,6 @@ SECTIONS
   PROVIDE( _sp1 = _tp1 + _stack_size );
 
   /* Heap end is at the end of memory, the memory size can set in kconfig */
-  /* PROVIDE( _heap_end = _ram_end - (4125 * 1024)); */
-  PROVIDE( _heap_end = _ram_end - (3950 * 1024));
+  PROVIDE( _heap_end = _ram_end );
 }
 
