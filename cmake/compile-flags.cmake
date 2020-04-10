@@ -9,7 +9,7 @@ add_compile_flags(LD
         -Wl,--end-group
         -Wl,-EL
         -Wl,--no-relax
-        -T ${SDK_ROOT}/lds/kendryte.ld
+        -T ${CMAKE_BINARY_DIR}/kendryte.ld
         )
 
 # C Flags Settings

@@ -35,6 +35,16 @@ IF(SUFFIX)
     SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES SUFFIX ${SUFFIX})
 ENDIF()
 
+if (EXISTS ${SDK_ROOT}/src/${PROJ}/proj_def.h)
+    add_custom_command(TARGET ${PROJECT_NAME} PRE_LINK
+            COMMAND ${CMAKE_C_COMPILER} -I ${SDK_ROOT}/src/${PROJ} -include ${SDK_ROOT}/src/${PROJ}/proj_def.h -C -P -x c -E ${SDK_ROOT}/lds/kendryte.ld -o ${CMAKE_BINARY_DIR}/kendryte.ld
+            COMMENT "Generating linker script file ...")
+else()
+    add_custom_command(TARGET ${PROJECT_NAME} PRE_LINK
+            COMMAND cp ${SDK_ROOT}/lds/kendryte.ld_org ${CMAKE_BINARY_DIR}/kendryte.ld
+            COMMENT "Copy linker script file ...")
+endif()
+
 # Build target
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_OBJCOPY} --output-format=binary ${CMAKE_BINARY_DIR}/${PROJECT_NAME}${SUFFIX} ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.bin
