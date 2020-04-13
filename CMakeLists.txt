@@ -19,13 +19,20 @@ project(${PROJ} C CXX ASM)
 # config self use headers
 include(./cmake/macros.internal.cmake)
 header_directories(${SDK_ROOT}/lib)
-header_directories(src/${PROJ})
+
+if (NOT EXISTS ${SDK_ROOT}/src/${PROJ}/project.cmake)
+    header_directories(src/${PROJ})
+endif ()
+
 header_directories(kendryte-standalone-demo/${PROJ})
 # build library first
 add_subdirectory(lib)
 
 # compile project
-# add_source_files(src/${PROJ}/*.c src/${PROJ}/*.s src/${PROJ}/*.S src/${PROJ}/*.cpp)
+if (NOT EXISTS ${SDK_ROOT}/src/${PROJ}/project.cmake)
+    add_source_files(src/${PROJ}/*.c src/${PROJ}/*.s src/${PROJ}/*.S src/${PROJ}/*.cpp)
+endif ()
+
 add_source_files(kendryte-standalone-demo/${PROJ}/*.c kendryte-standalone-demo/${PROJ}/*.s kendryte-standalone-demo/${PROJ}/*.S kendryte-standalone-demo/${PROJ}/*.cpp)
 include(./cmake/executable.cmake)
 

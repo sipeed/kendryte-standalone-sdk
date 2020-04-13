@@ -14,8 +14,6 @@ removeDuplicateSubstring(${CMAKE_CXX_FLAGS} CMAKE_CXX_FLAGS)
 
 if (EXISTS ${SDK_ROOT}/src/${PROJ}/project.cmake)
     include(${SDK_ROOT}/src/${PROJ}/project.cmake)
-else()
-    add_source_files(src/${PROJ}/*.c src/${PROJ}/*.s src/${PROJ}/*.S src/${PROJ}/*.cpp)
 endif ()
 
 message("SOURCE_FILES=${SOURCE_FILES}")
@@ -32,6 +30,10 @@ target_link_libraries(${PROJECT_NAME}
         -Wl,--no-whole-archive
         -Wl,--end-group
         )
+
+if (EXISTS ${SDK_ROOT}/src/${PROJ}/face_lib.cmake)
+    include(${SDK_ROOT}/src/${PROJ}/face_lib.cmake)
+endif ()
 
 IF(SUFFIX)
     SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES SUFFIX ${SUFFIX})
