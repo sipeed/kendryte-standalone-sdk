@@ -3597,6 +3597,7 @@ static void prvCheckTasksWaitingTermination( void )
 		pxTaskStatus->uxCurrentPriority = pxTCB->uxPriority;
 		pxTaskStatus->pxStackBase = pxTCB->pxStack;
 		pxTaskStatus->xTaskNumber = pxTCB->uxTCBNumber;
+		pxTaskStatus->pxStackTop = pxTCB->pxTopOfStack;
 
 		#if ( configUSE_MUTEXES == 1 )
 		{
