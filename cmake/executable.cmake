@@ -55,5 +55,11 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         DEPENDS ${PROJECT_NAME}
         COMMENT "Generating .bin file ...")
 
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_SIZE} ${CMAKE_BINARY_DIR}/${PROJECT_NAME}${SUFFIX}
+        DEPENDS ${PROJECT_NAME}
+        COMMENT "============= firmware ============="
+        )
+
 # show information
 include(${CMAKE_CURRENT_LIST_DIR}/dump-config.cmake)
