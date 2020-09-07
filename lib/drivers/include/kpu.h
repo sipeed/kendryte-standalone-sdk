@@ -693,8 +693,18 @@ typedef struct
         struct
         {
             const uint8_t *model_buffer;
+            const uint8_t *model_header_buffer;
             uint8_t *main_buffer;
 			/*Add for Flash loader*/
+            union
+            {
+                uint32_t reg;
+                struct
+                {
+                    uint32_t flash_mode:1;
+                    uint32_t reserved:31;
+                } flag;
+            } flag;
 			uint32_t spi_speed;
 			uint8_t *model_buffer_ram_original;
 			uint8_t *model_buffer_ram;
@@ -706,6 +716,7 @@ typedef struct
 			uint8_t* layer_buf[2];	//预留两个buf
 			kpu_layer_buf_t buf_layer_info[2];	//[start, end),loading,oft
 			uint32_t virtual_model_buffer[2];
+            uint8_t* temp_buff_addr;
 			/*end of Add for Flash loader*/
             uint32_t output_count;
             const kpu_model_output_t *outputs;
