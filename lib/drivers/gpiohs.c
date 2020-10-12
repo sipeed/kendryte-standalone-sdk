@@ -63,16 +63,10 @@ void gpiohs_set_drive_mode(uint8_t pin, gpio_drive_mode_t mode)
     }
 
     fpioa_set_io_pull(io_number, pull);
-    // volatile uint32_t *reg = dir ? gpiohs->output_en.u32 : gpiohs->input_en.u32;
-    // volatile uint32_t *reg_d = !dir ? gpiohs->output_en.u32 : gpiohs->input_en.u32;
-    // set_gpio_bit(reg_d, pin, 0);
-    // set_gpio_bit(reg, pin, 1);
-    gpiohs->input_en.u32[0] |= ((uint32_t)1 << pin);
-    if (dir) {
-        gpiohs->output_en.u32[0] |= ((uint32_t)1 << pin);
-    } else {
-        gpiohs->input_en.u32[0] &= ~((uint32_t)1 << pin);
-    }
+    volatile uint32_t *reg = dir ? gpiohs->output_en.u32 : gpiohs->input_en.u32;
+    volatile uint32_t *reg_d = !dir ? gpiohs->output_en.u32 : gpiohs->input_en.u32;
+    set_gpio_bit(reg_d, pin, 0);
+    set_gpio_bit(reg, pin, 1);
 }
 
 gpio_pin_value_t gpiohs_get_pin(uint8_t pin)
