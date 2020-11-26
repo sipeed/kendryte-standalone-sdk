@@ -42,6 +42,11 @@ static inline uint64_t byteswap64(uint64_t x)
     return ((uint64_t)BYTESWAP(b) << 32) | (uint64_t)BYTESWAP(a);
 }
 
+void sha256_update_length(size_t input_len)
+{
+    sha256->sha_num_reg.sha_data_cnt = (uint32_t)((input_len + SHA256_BLOCK_LEN + 8) / SHA256_BLOCK_LEN);
+}
+
 void sha256_init(sha256_context_t *context, size_t input_len)
 {
     sysctl_clock_enable(SYSCTL_CLOCK_SHA);

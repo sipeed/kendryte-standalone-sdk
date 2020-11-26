@@ -120,6 +120,9 @@ void sha256_final(sha256_context_t *context, uint8_t *output);
  */
 void sha256_hard_calculate(const uint8_t *input, size_t input_len, uint8_t *output);
 
+void sha256_update_length(size_t input_len);
+
+
 #ifdef __cplusplus
 }
 #endif
