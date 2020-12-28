@@ -63,3 +63,11 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 
 # show information
 include(${CMAKE_CURRENT_LIST_DIR}/dump-config.cmake)
+
+if (EXISTS ${SDK_ROOT}/src/${PROJ}/version.cmake)
+    include(${SDK_ROOT}/src/${PROJ}/version.cmake)
+endif ()
+
+if (EXISTS ${SDK_ROOT}/src/${PROJ}/pack_ota.cmake)
+    include(${SDK_ROOT}/src/${PROJ}/pack_ota.cmake)
+endif ()
